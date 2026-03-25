@@ -5,12 +5,28 @@
   "description": "Playwright E2E tests for the Truly Legit merchant portal (truly_legit)",
   "scripts": {
     "test": "playwright test",
-    "test:headed": "playwright test --headed",
+    "test:local": "cross-env E2E_TARGET=local playwright test",
+    "test:dev": "cross-env E2E_TARGET=dev playwright test",
+    "test:qa": "cross-env E2E_TARGET=qa playwright test",
     "test:ui": "playwright test --ui",
+    "test:local:ui": "cross-env E2E_TARGET=local playwright test --ui",
+    "test:dev:ui": "cross-env E2E_TARGET=dev playwright test --ui",
+    "test:qa:ui": "cross-env E2E_TARGET=qa playwright test --ui",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "report": "playwright show-report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.0"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^25.5.0",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.3.1",
+    "eslint": "^10.1.0",
+    "eslint-plugin-playwright": "^2.10.1",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.57.2"
   },
   "engines": {
     "node": ">=20"
