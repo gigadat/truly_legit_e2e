@@ -42,7 +42,7 @@ Optional (for future authenticated tests): `E2E_USER_EMAIL`, `E2E_USER_PASSWORD`
 
 ## Contract with the portal
 
-Tests rely on **`data-testid`** hooks added in **`truly_legit`** (Vue/Inertia). Naming conventions and PR expectations are documented in the portal repo: [`docs/e2e-testids.md`](../truly_legit/docs/e2e-testids.md) (relative path when both repos are checked out side by side).
+Tests rely on **`data-testid`** hooks added in **`truly_legit`** (Vue/Inertia). Naming conventions and PR expectations are documented in the portal repo: [`docs/e2e-testids.md`](../truly_legit/docs/e2e-testids.md) when both repositories are checked out side by side under the same parent folder.
 
 ## Repository layout
 
