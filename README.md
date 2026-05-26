@@ -71,8 +71,44 @@ To use **different users per environment** in Actions, extend the workflow `env`
 
 Tests rely on **`data-testid`** hooks in **`truly_legit`** (Vue/Inertia); every id **must** start with **`pw-`**. Conventions: [`docs/e2e-testids.md`](../truly_legit/docs/e2e-testids.md) when both repositories are checked out side by side.
 
+## Persona / billing data setup
+
+Persona-sensitive flows (e.g. **Change Plan downgrade** 1.0 vs 2.0) need controlled values for `sites.current_billing_cycle_sessions` (the field `Merchant::getBillingPeriodSiteSessions()` reads). To avoid recording real traffic, tests use a **test-only HTTP endpoint** the portal must expose under a non-production env + bearer token:
+
+```
+GET  {E2E_USAGE_API_URL}/merchants/{id}/usage
+POST {E2E_USAGE_API_URL}/merchants/{id}/usage   body: { "totalSessions": <int> }
+Authorization: Bearer {E2E_USAGE_API_TOKEN}
+```
+
+Wire it via `.env` (or per-target `E2E_<TARGET>_USAGE_API_URL` / `_TOKEN`):
+
+```
+E2E_USAGE_API_URL=https://dev.trulylegit.com/internal/e2e
+E2E_USAGE_API_TOKEN=...rotating-secret...
+E2E_PERSONA_MERCHANT_ID=12345
+E2E_PERSONA_NEW_TIER_THRESHOLD=10000
+```
+
+In tests, use the `usageApi` fixture (`tests/fixtures/billing.ts`):
+
+```ts
+import { test, expect } from '../fixtures/billing.js';
+
+test('persona 2.0 sees red Usage Notice', async ({ page, usageApi }) => {
+  test.skip(!usageApi, 'usage API not configured');
+  await usageApi!.setSiteUsage(15000); // baseline auto-restored after the test
+  // ...drive Change Plan, assert red Usage Notice container...
+});
+```
+
+Specs **skip cleanly** when env vars are missing; the fixture restores any merchant baseline it changed in teardown. **Do not enable the endpoint on production.**
+
 ## Repository layout
 
 - `e2e-environments.ts` — reads `E2E_*` / `BASE_URL` from `.env` into Playwright config
 - `tests/smoke/` — minimal checks (e.g. health endpoint)
 - `tests/auth/` — login and future session flows
+- `tests/fixtures/billing.ts` — `usageApi` fixture (test-only) for persona setup
+- `tests/helpers/usage-api.ts` — low-level client used by the fixture
+- `tests/billing/` — persona / Change Plan specs (see `persona-setup.example.spec.ts`)
